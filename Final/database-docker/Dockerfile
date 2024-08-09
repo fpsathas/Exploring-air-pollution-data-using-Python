@@ -1,0 +1,26 @@
+# set the base image with specific tag/version
+FROM python:3.9
+
+# update all packages, install cron module and the text editors vim and nano
+RUN apt-get update && apt-get -y install cron
+RUN apt-get -y install vim nano
+
+# set up working directory inside the container
+WORKDIR /app
+
+# copy and run the requirements.txt file to install the required packages.
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+RUN mkdir ./data
+
+# copy files from  directory to the image's filesystem
+COPY . .
+
+# register a cron job to start the webscraper application
+# it needs the absolute paths (runnning 'which python' inside the container might be useful)
+#RUN crontab -l | { cat; echo "* * * * * /usr/local/bin/python /app/webscraper-postgres.py"; } | crontab -
+#RUN tail -f /dev/null
+
+# start cron in foreground and set it as executable command for when the container starts
+CMD ["python", "aqi.py"]
+CMD ["tail", "-f", "/dev/null"]

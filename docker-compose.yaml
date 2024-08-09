@@ -1,0 +1,32 @@
+version: '3'
+services:
+  postgresdb:
+    image: postgres
+    container_name: postgres-db
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=docker # required variable, postgres username is by default 'postgres' 
+    volumes:
+      - pgadmin:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports: 
+      - 80:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+    depends_on:
+      - postgresdb
+
+  scraper:
+    build: .  # build this container's image using the Dockerfile
+    volumes:
+      - /final/DAY2/webscraper+postgres/csv:/app/csv # path of your host filesystem to container's filesystem
+    depends_on:
+      - postgresdb
+
+
+volumes:
+  pgadmin:
